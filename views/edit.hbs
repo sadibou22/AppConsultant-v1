@@ -1,0 +1,36 @@
+<h1>{{title}} Numero {{unConsultant._id}}</h1>
+
+<form method="post" action="/edit/{{unConsultant._id}}">
+ 
+   <fieldset >
+       </br></br></br>
+       <legend >Name</legend> <!-- Titre du fieldset --> 
+
+       <label for="nom">Prénom </label>
+       <input type="text" name="prenom" id="prenom" value="{{unConsultant.Prenom}}" /></br></br></br>
+
+       <label for="prenom">Nom </label>
+       <input type="text" name="nom" id="nom" value="{{unConsultant.Nom}}" /></br></br></br>
+
+   </fieldset>
+   <fieldset>
+       <legend>Liste projets</legend> <!-- Titre du fieldset -->
+       
+       <p>
+           <textarea name="projet" id="projet" cols="40" rows="4"></textarea></br>
+           <label for="projet" style="color:red"> Note: separer par une virgule ','</label>
+       </p>
+   </fieldset>
+ 
+   <fieldset>
+       <legend>Liste compétences</legend> <!-- Titre du fieldset -->
+       <p>
+           <textarea name="projet" id="projet" cols="40" rows="4"></textarea></br>
+           <label for="projet" style="color:red"> Note: separer par une virgule ','</label>
+       </p>
+   </fieldset>
+   <div>
+        </br></br></br><input type='submit' value='Mettre a jour' />
+   </div>
+    
+</form>
