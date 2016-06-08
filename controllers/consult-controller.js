@@ -80,7 +80,8 @@ exports.editByPostConsultant = function(req, res) {
     c.Prenom=req.body.prenom;
     c.Nom=req.body.nom;
     c.save();
-    res.redirect('/consultants');
+    //res.redirect('/consultants/:id');
+	return res.render('affiche', { title: 'Consultant', unConsultant:c});
   });
 };
 

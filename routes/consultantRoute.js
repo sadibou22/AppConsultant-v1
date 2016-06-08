@@ -16,7 +16,7 @@ router.get('/consultants', consulController.getAllConsultants);
 router.get('/consultants/:id', consulController.getConsultant);
 
 // define one consultant route-- get--Edit un consultant
-router.get('/edit/:id', consulController.editConsultant);
+router.get('/edit/:id', consulController.editByGetConsultant);
 router.post('/edit/:id', consulController.editByPostConsultant);
 
 // define one consultant route-- get--Delete un consultant

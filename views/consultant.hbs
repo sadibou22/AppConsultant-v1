@@ -1,10 +1,11 @@
 <h1>{{title}}</h1>
-<div>Gestion Consultants</div>
+
 
 {{#each allConsultants}}
 	<h2>Nom :{{this.Prenom}} {{this.Nom}}</h2>
 	<div>Competences :{{this.Competences}}</div>
 	<div>Projets :{{this.Projets}}</div>
+		
 	<div>
 		<a href="/consultants/{{this._id}}">Afficher</a> &nbsp;
 		<a href="/edit/{{this._id}}">Modifier</a> &nbsp;
@@ -12,3 +13,8 @@
 	</div>
 {{/each}}
 
+{{myp}} : {{this.Projets}}
+		<div>Gestion projet {{myp}}</div>
+		{{#each this.Projets}}
+			<p>projet : {{this.this.projet}}</p>
+		{{/each}}
