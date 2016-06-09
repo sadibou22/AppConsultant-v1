@@ -13,8 +13,11 @@
 	</div>
 {{/each}}
 
-{{myp}} : {{this.Projets}}
-		<div>Gestion projet {{myp}}</div>
-		{{#each this.Projets}}
-			<p>projet : {{this.this.projet}}</p>
-		{{/each}}
+	
+<h1>Recherche:</h1>
+<div>
+    <form action='/search' method='GET'>
+                    <label>Recherche par projet : </label><input type="text" name="projetName" required placeholder="entrez nom du projet" />
+                    <input type='submit' value='Recherche' />
+    </form>
+</div>	

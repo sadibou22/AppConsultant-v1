@@ -1,0 +1,1 @@
+avec un systeme de template handlebars 

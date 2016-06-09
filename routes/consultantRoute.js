@@ -22,7 +22,8 @@ router.post('/edit/:id', consulController.editByPostConsultant);
 // define one consultant route-- get--Delete un consultant
 router.get('/delete/:id', consulController.deleteConsultant);
 
-
+//recherche par nom projet
+router.get('/search', consulController.getConsultantByProjet);
 
 
 module.exports = router;

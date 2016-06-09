@@ -2,6 +2,8 @@ var fs = require('fs');
 var csv=require('csv2json-convertor');//importing csv2json-
 var serviceApp = require('../services/servicesApp.js');
 var serviceModel= require('../models/consultant-model.js');
+var url = require('url');
+const queryString = require('query-string');
 
 exports.uploadFile = function(req, res){
     var sampleFile;
@@ -102,7 +104,23 @@ exports.deleteConsultant = function(req, res) {
 	});
 };
 
-
+//recherche par competences
+exports.getConsultantByProjet = function(req, res){
+	var projetName =req.query.projetName; //'ca';url.href;//.search;//.query.projetName;//req.params.projetName;
+	//console.log('test nom...'+projetName);
+    serviceModel.ConsultantModel.find({Projets:projetName}, function(err, consultants){
+		if(err) {
+			res.status(500).send('WARNING***quelques chose cloche!');
+		} else if(consultants == null) {
+			res.send('Désolé, consultant inexistant');
+			//res.json(consultant);		
+		} else{
+			//res.json(consultants); 
+			//console.log(consultants); 
+			return res.render('consultant', { title: 'Projet '+ projetName, allConsultants:consultants});
+		}
+	});
+}
 
 //mes methodes
 var saveConsultants = function(filname){
