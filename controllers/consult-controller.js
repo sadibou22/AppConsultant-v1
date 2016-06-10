@@ -114,10 +114,13 @@ switch(choice)
 	case"competence":getConsultantByCompetences(req.query.intputSearch, res);
 	break;
 	case "id":getConsultantByID(req.query.intputSearch, res);
+	break;
 	//execute code block 2
-	case "nom":getConsultantByNom(req.query.intputSearch);
+	case "nom":getConsultantByNom(req.query.intputSearch, res);
+	break;
 	//execute code block 2
 	case "prenom":getConsultantByPrenom(req.query.intputSearch, res);
+	break;
 	//execute code block 2
 	case "projet":getConsultantByProjet(req.query.intputSearch, res);
 	break;
@@ -227,7 +230,7 @@ var getConsultantByProjet = function(projetName, c){
     serviceModel.ConsultantModel.find({Projets:{$regex: new RegExp('^' + projetName.toLowerCase(), 'i')}}, function(err, consultants){
 		if(err) {
 			c.status(500).send('WARNING***quelques chose cloche!');
-		} else if(consultants == null) {
+		} else if(consultants.length == 0) {
 			c.send('Désolé, consultant inexistant');
 			//res.json(consultant);		
 		} else{
@@ -248,7 +251,7 @@ var getConsultantByCompetences = function(consulComp, c) {
 	serviceModel.ConsultantModel.find({'Competences': {$regex: new RegExp('^' + consulComp.toLowerCase(), 'i')}}, function(err, consultants){
 		if(err) {
 			c.status(500).send('WARNING***quelques chose cloche!');
-		} else if(consultants == null) {
+		} else if(consultants.length ==0) {
 			c.send('Désolé, consultant inexistant'); 
 		} else{
 		//res.json(consultant); 
@@ -265,29 +268,29 @@ var getConsultantByPrenom = function(prenom, c){
 	serviceModel.ConsultantModel.find({Prenom: {$regex: new RegExp('^' + prenom.toLowerCase(), 'i')}}, function(err, consultants){
 		if(err) {
 			c.status(500).send('WARNING***quelques chose cloche!');
-		} else if(consultants == null) {
+		} else if(consultants.length == 0) {
 			c.send('Désolé, consultant inexistant'); 
 		} else{
 		//res.json(consultant); 
-			c.render('consultant', { title: 'Prénom pp '+ prenom, allConsultants:consultants});
+			c.render('consultant', { title: 'Prénom '+ prenom, allConsultants:consultants});
 		}
 	});
 
 }
 
 //recherche by nom
-var getConsultantByNom = function(nom){
+var getConsultantByNom = function(nom, c){
 	var regex = new RegExp(["^", String, "$"].join(""), "i");
 	try {
 		serviceModel.ConsultantModel.find({Nom: {$regex: new RegExp('^' + nom.toLowerCase(), 'i')}}, function(err, consultants){
 			if(err) {
-				console.log('erre test');//c.status(500).send('WARNING***quelques chose cloche!');
+				c.status(500).send('WARNING***quelques chose cloche!');
 			} else if(consultants.length == 0) {
-				console.log('erre test222');//c.send('Désolé, consultant inexistant'); 
+				c.send('Désolé, consultant inexistant'); 
 			} else{
 			//res.json(consultant); 
-				//c.render('consultant', { title: 'Nom'+ nom, allConsultants:consultants});
-				console.log('trouvé');
+				c.render('consultant', { title: 'Nom'+ nom, allConsultants:consultants});
+				//console.log('trouvé');
 			}
 		});
 
