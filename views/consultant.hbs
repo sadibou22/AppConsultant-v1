@@ -1,23 +1,45 @@
 <h1>{{title}}</h1>
 
+<div class="container">
+	<table class="table table-striped">
+		<thead>
+			<tr>
+				<th>EmployeeNo</th>
+				<th>First Name</th>
+				<th>Last Name</th>
+				<th>Copetencies</th>
+				<th>Projects</th>
+			</tr>
+		</thead>
+		{{#each allConsultants}}
+			<tbody>
+				<tr>
+					<td>{{this._id}}</td>
+					<td>{{this.Prenom}}</td>
+					<td> {{this.Nom}}</td>
+					<td>{{this.Competences}}</td>
+					<td>{{this.Projets}}</td>
 
-{{#each allConsultants}}
-	<h2>Nom :{{this.Prenom}} {{this.Nom}}</h2>
-	<div>Competences :{{this.Competences}}</div>
-	<div>Projets :{{this.Projets}}</div>
-		
-	<div>
-		<a href="/consultants/{{this._id}}">Afficher</a> &nbsp;
-		<a href="/edit/{{this._id}}">Modifier</a> &nbsp;
-		<a href="/delete/{{this._id}}">Supprimer</a>
-	</div>
-{{/each}}
-
-	
+					<td> <a href="/consultants/{{this._id}}">Afficher</a></td>
+					<td><a href="/edit/{{this._id}}">Modifier</a></td>
+					<td><a href="/delete/{{this._id}}">Supprimer</a></td>
+				</tr>
+			</tbody>
+		{{/each}}
+	</table>
+</div>
 <h1>Recherche:</h1>
 <div>
     <form action='/search' method='GET'>
-                    <label>Recherche par projet : </label><input type="text" name="projetName" required placeholder="entrez nom du projet" />
-                    <input type='submit' value='Recherche' />
+		<label>Recherche par  </label>
+		<select name="searchChoice">
+			<option value="competence">Compétence</option>
+			<option value="id">ID</option>
+			<option value="nom">Nom</option>
+			<option value="prenom">Prénom</option>
+			<option value="projet">Projet</option>
+		</select>
+        <input type="text" name="intputSearch" required placeholder="entrez nom du projet" />
+        <input type='submit' value='Recherche' />
     </form>
 </div>	

@@ -104,22 +104,26 @@ exports.deleteConsultant = function(req, res) {
 	});
 };
 
-//recherche par competences
-exports.getConsultantByProjet = function(req, res){
-	var projetName =req.query.projetName; //'ca';url.href;//.search;//.query.projetName;//req.params.projetName;
-	//console.log('test nom...'+projetName);
-    serviceModel.ConsultantModel.find({Projets:projetName}, function(err, consultants){
-		if(err) {
-			res.status(500).send('WARNING***quelques chose cloche!');
-		} else if(consultants == null) {
-			res.send('Désolé, consultant inexistant');
-			//res.json(consultant);		
-		} else{
-			//res.json(consultants); 
-			//console.log(consultants); 
-			return res.render('consultant', { title: 'Projet '+ projetName, allConsultants:consultants});
-		}
-	});
+
+//Methode search 
+exports.searchConsultant = function(req, res){
+	var choice = req.query.searchChoice;
+//debut
+switch(choice)
+{
+	case"competence":getConsultantByCompetences(req.query.intputSearch, res);
+	break;
+	case "id":getConsultantByID(req.query.intputSearch, res);
+	//execute code block 2
+	case "nom":getConsultantByNom(req.query.intputSearch);
+	//execute code block 2
+	case "prenom":getConsultantByPrenom(req.query.intputSearch, res);
+	//execute code block 2
+	case "projet":getConsultantByProjet(req.query.intputSearch, res);
+	break;
+	//default: res.send('invalide choice..')	
+}
+//fin
 }
 
 //mes methodes
@@ -213,5 +217,102 @@ var saveConsultantCsvInMongo = function(data,j){
 		}
 	});
 	
+}
+
+//recherche par projets
+var getConsultantByProjet = function(projetName, c){
+	//var projetName =req.query.projetName; //'ca';url.href;//.search;//.query.projetName;//req.params.projetName;
+	var regex = new RegExp(["^", String, "$"].join(""), "i");
+	
+    serviceModel.ConsultantModel.find({Projets:{$regex: new RegExp('^' + projetName.toLowerCase(), 'i')}}, function(err, consultants){
+		if(err) {
+			c.status(500).send('WARNING***quelques chose cloche!');
+		} else if(consultants == null) {
+			c.send('Désolé, consultant inexistant');
+			//res.json(consultant);		
+		} else{
+			//res.json(consultants); 
+			//console.log(consultants); 
+			return c.render('consultant', { title: 'Projet '+ projetName, allConsultants:consultants});
+		}
+	});
+}
+
+//recherche par competences
+var getConsultantByCompetences = function(consulComp, c) {
+
+ //var consulComp = req.query.Competences;
+	//select * from consultant where (upper(consultant.competencies)) like '%competencies%'
+	var regex = new RegExp(["^", String, "$"].join(""), "i");
+
+	serviceModel.ConsultantModel.find({'Competences': {$regex: new RegExp('^' + consulComp.toLowerCase(), 'i')}}, function(err, consultants){
+		if(err) {
+			c.status(500).send('WARNING***quelques chose cloche!');
+		} else if(consultants == null) {
+			c.send('Désolé, consultant inexistant'); 
+		} else{
+		//res.json(consultant); 
+			c.render('consultant', { title: 'Competences'+ consulComp, allConsultants:consultants});
+		}
+	});
+};
+
+//recherche by prenom
+var getConsultantByPrenom = function(prenom, c){
+
+	var regex = new RegExp(["^", String, "$"].join(""), "i");
+
+	serviceModel.ConsultantModel.find({Prenom: {$regex: new RegExp('^' + prenom.toLowerCase(), 'i')}}, function(err, consultants){
+		if(err) {
+			c.status(500).send('WARNING***quelques chose cloche!');
+		} else if(consultants == null) {
+			c.send('Désolé, consultant inexistant'); 
+		} else{
+		//res.json(consultant); 
+			c.render('consultant', { title: 'Prénom pp '+ prenom, allConsultants:consultants});
+		}
+	});
+
+}
+
+//recherche by nom
+var getConsultantByNom = function(nom){
+	var regex = new RegExp(["^", String, "$"].join(""), "i");
+	try {
+		serviceModel.ConsultantModel.find({Nom: {$regex: new RegExp('^' + nom.toLowerCase(), 'i')}}, function(err, consultants){
+			if(err) {
+				console.log('erre test');//c.status(500).send('WARNING***quelques chose cloche!');
+			} else if(consultants.length == 0) {
+				console.log('erre test222');//c.send('Désolé, consultant inexistant'); 
+			} else{
+			//res.json(consultant); 
+				//c.render('consultant', { title: 'Nom'+ nom, allConsultants:consultants});
+				console.log('trouvé');
+			}
+		});
+
+	} catch (err) {
+	// Handle the error here.
+	console.log('hum')
+	}
+	
+}
+
+//recherche by ID
+var getConsultantByID = function(consulId, c){
+
+	//var consulId = req.params.id;
+    serviceModel.ConsultantModel.findById(consulId, function(err, consultant){
+		if(err) {
+			c.status(500).send('WARNING***quelques chose cloche!');
+		} else if(consultant == null) {
+			c.send('Désolé, consultant inexistant');
+			//res.json(consultant);		
+		} else{
+			//res.json(consultant); 
+			c.render('affiche', { title: 'Consultant ID: '+consulId, unConsultant:consultant});
+		}
+	});
+
 }
 

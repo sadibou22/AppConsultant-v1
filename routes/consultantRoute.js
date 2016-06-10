@@ -23,7 +23,7 @@ router.post('/edit/:id', consulController.editByPostConsultant);
 router.get('/delete/:id', consulController.deleteConsultant);
 
 //recherche par nom projet
-router.get('/search', consulController.getConsultantByProjet);
+router.get('/search', consulController.searchConsultant);
 
 
 module.exports = router;
