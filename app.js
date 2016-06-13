@@ -7,11 +7,11 @@ var bodyParser = require('body-parser');
 var MongooseConnection = require('./models/consultant-model.js');
 var fileUpload = require('express-fileupload');
 
-var port = 8000;
 
 //Mes routes
 var indexRoute = require('./routes/index-route');
 var consultantRoute = require('./routes/consultantRoute');
+var errorRoute = require('./routes/error-route');
 
 
 var app = express();
@@ -31,6 +31,11 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(fileUpload());
 
+// =================================================================
+// configuration ===================================================
+// =================================================================
+var port = process.env.PORT || 8080; // used to create, sign, and verify tokens
+//mongoose.connect(config.database); // connect to database
 //Connection BD
 MongooseConnection.connect();
 
@@ -39,6 +44,9 @@ MongooseConnection.connect();
 app.use('/', indexRoute);
 //gestion consultants
 app.use('/', consultantRoute);
+//gestion error
+app.use('/', errorRoute);
+
 
 
 

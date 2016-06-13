@@ -5,7 +5,7 @@ var urlDB = 'mongodb://localhost/myapp';
 
 exports.extensionsValides=['csv','json'];
 //exports.fileExt //stock l'extension du fichier
-var getExtension2 = function(filename)
+exports.getExtension = function(filename)
     {
         var parts = filename.split(".");
         return (parts[(parts.length-1)]);
@@ -15,10 +15,10 @@ var getExtension2 = function(filename)
     // v�rifie l'extension d'un fichier upload�
     // filename : file a valider
     // listeExt : liste des extensions autoris�es
-exports.verifFileExtension =  function(listeExt, filename )
+exports.verifFileExtension =  function(listeExt, filename)
     {
 	//filename = document.getElementById(champ).value.toLowerCase();
-	var fileExt = getExtension2(filename);
+	var fileExt = exports.getExtension(filename);
 	for (var i=0; i<listeExt.length; i++)
 	{
 		if ( fileExt == listeExt[i] ) 
@@ -28,15 +28,11 @@ exports.verifFileExtension =  function(listeExt, filename )
 		}
 	}
 	console.log("le fichier doit etre csv ou json");
+    //c.render('error', {message:'Desolé, ce format de fichier ne peut pas etre traiter..'});
 	return (false);
-     }
+    
+    }
  
-exports.getExtension = function(filename)
-    {
-        var parts = filename.split(".");
-        return (parts[(parts.length-1)]);
-    }    
-	
     
 //connexion   
 exports.connect = function(urlDB) {

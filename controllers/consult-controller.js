@@ -2,14 +2,15 @@ var fs = require('fs');
 var csv=require('csv2json-convertor');//importing csv2json-
 var serviceApp = require('../services/servicesApp.js');
 var serviceModel= require('../models/consultant-model.js');
-var url = require('url');
-const queryString = require('query-string');
+var validator = require('validator');
+
 
 exports.uploadFile = function(req, res){
     var sampleFile;
 
 	if (!req.files) {
-		res.send('No files were uploaded.');
+		//res.send('No files were uploaded.');
+		res.render('success', {message:'No files were uploaded'});
 		return;
 	}
  
@@ -22,7 +23,7 @@ exports.uploadFile = function(req, res){
 		else {
 			//res.send('File uploaded!');
 			saveConsultants(myPath);
-			res.render('success');
+			res.render('success', {message:'Upload avec success.....'});
             
 		}
 	});
@@ -49,7 +50,8 @@ exports.getConsultant = function(req, res) {
 		if(err) {
 			res.status(500).send('WARNING***quelques chose cloche!');
 		} else if(consultant == null) {
-			res.send('Désolé, consultant inexistant');
+			//res.send('Désolé, consultant inexistant');
+			res.render('error' ,{message:'Désolé, consultant inexistant'});
 			//res.json(consultant);		
 		} else{
 			//res.json(consultant); 
@@ -108,32 +110,28 @@ exports.deleteConsultant = function(req, res) {
 //Methode search 
 exports.searchConsultant = function(req, res){
 	var choice = req.query.searchChoice;
-//debut
-switch(choice)
-{
-	case"competence":getConsultantByCompetences(req.query.intputSearch, res);
-	break;
-	case "id":getConsultantByID(req.query.intputSearch, res);
-	break;
-	//execute code block 2
-	case "nom":getConsultantByNom(req.query.intputSearch, res);
-	break;
-	//execute code block 2
-	case "prenom":getConsultantByPrenom(req.query.intputSearch, res);
-	break;
-	//execute code block 2
-	case "projet":getConsultantByProjet(req.query.intputSearch, res);
-	break;
-	//default: res.send('invalide choice..')	
-}
-//fin
+	
+	var champs = req.query.intputSearch;
+	
+	switch(choice)
+	{
+		case"competence":getConsultantByCompetences(champs, res );
+		break;
+		case "id":getConsultantByID(req.query.intputSearch, res);
+		break;
+		case "nom":getConsultantByNom(req.query.intputSearch, res);
+		break;
+		case "prenom":getConsultantByPrenom(req.query.intputSearch, res);
+		break;
+		case "projet":getConsultantByProjet(req.query.intputSearch, res);
+		break;
+		//default: res.send('invalide choice..')	
+	}
+
 }
 
 //mes methodes
-var saveConsultants = function(filname){
-    
-    
-    
+var saveConsultants = function(filname){ 
     //validation fichier avec l'extension
 	var valideExt = serviceApp.verifFileExtension(serviceApp.extensionsValides,filname);
 	console.log(valideExt);
@@ -158,7 +156,8 @@ var saveConsultants = function(filname){
                     } */
             break;
             default:
-            console.log('Desolé, ce format de fichier ne peut pas etre traiter..')
+            //console.log('Desolé, ce format de fichier ne peut pas etre traiter..')
+			res.render('error', {message:'Desolé, ce format de fichier ne peut pas etre traiter..'});
         }
 		
 		
@@ -224,80 +223,100 @@ var saveConsultantCsvInMongo = function(data,j){
 
 //recherche par projets
 var getConsultantByProjet = function(projetName, c){
-	//var projetName =req.query.projetName; //'ca';url.href;//.search;//.query.projetName;//req.params.projetName;
-	var regex = new RegExp(["^", String, "$"].join(""), "i");
-	
-    serviceModel.ConsultantModel.find({Projets:{$regex: new RegExp('^' + projetName.toLowerCase(), 'i')}}, function(err, consultants){
-		if(err) {
-			c.status(500).send('WARNING***quelques chose cloche!');
-		} else if(consultants.length == 0) {
-			c.send('Désolé, consultant inexistant');
-			//res.json(consultant);		
-		} else{
-			//res.json(consultants); 
-			//console.log(consultants); 
-			return c.render('consultant', { title: 'Projet '+ projetName, allConsultants:consultants});
-		}
-	});
+	if(!validator.isAlpha(projetName)){
+		c.render('error' ,{message:'WARNING***quelques chose cloche!'+c.status(500)}); 
+	}else{
+		var regex = new RegExp(["^", String, "$"].join(""), "i");
+		
+		serviceModel.ConsultantModel.find({Projets:{$regex: new RegExp('^' + projetName.toLowerCase(), 'i')}}, function(err, consultants){
+			if(err) {
+				c.status(500).send('WARNING***quelques chose cloche!');
+			} else if(consultants.length == 0) {
+				c.render('error', {message:'Désolé, Consultant inexistant'}); 
+				//res.json(consultant);		
+			} else{
+				//res.json(consultants); 
+				//console.log(consultants); 
+				return c.render('consultant', { title: 'Projet '+ projetName, allConsultants:consultants});
+			}
+		});
+	}//fin else
 }
 
 //recherche par competences
-var getConsultantByCompetences = function(consulComp, c) {
+var getConsultantByCompetences = function(consulComp, c ) {
 
- //var consulComp = req.query.Competences;
-	//select * from consultant where (upper(consultant.competencies)) like '%competencies%'
-	var regex = new RegExp(["^", String, "$"].join(""), "i");
+	if(!validator.isAlpha(consulComp)){
+		c.render('error' ,{message:'WARNING***quelques chose cloche!'});
+		
+	}else{
 
-	serviceModel.ConsultantModel.find({'Competences': {$regex: new RegExp('^' + consulComp.toLowerCase(), 'i')}}, function(err, consultants){
-		if(err) {
-			c.status(500).send('WARNING***quelques chose cloche!');
-		} else if(consultants.length ==0) {
-			c.send('Désolé, consultant inexistant'); 
-		} else{
-		//res.json(consultant); 
-			c.render('consultant', { title: 'Competences'+ consulComp, allConsultants:consultants});
-		}
-	});
+	//var consulComp = req.query.Competences;
+		//select * from consultant where (upper(consultant.competencies)) like '%competencies%'
+		var regex = new RegExp(["^", String, "$"].join(""), "i");
+
+		serviceModel.ConsultantModel.find({'Competences': {$regex: new RegExp('^' + consulComp.toLowerCase(), 'i')}}, function(err, consultants){
+			if(err) {
+				c.render('error' ,{message:'WARNING***quelques chose cloche!'+c.status(500)});
+			} else if(consultants.length ==0) {
+				c.render('error', {message:'Désolé, Consultant inexistant'}); 
+			} else{
+			//res.json(consultant); 
+				c.render('consultant', { title: 'Competences'+ consulComp, allConsultants:consultants});
+			}
+		});
+	}//fin else
 };
 
 //recherche by prenom
 var getConsultantByPrenom = function(prenom, c){
 
-	var regex = new RegExp(["^", String, "$"].join(""), "i");
+	if(!validator.isAlpha(prenom)){
+		c.render('error' ,{message:'WARNING***quelques chose cloche!'});	
+	}else{
 
-	serviceModel.ConsultantModel.find({Prenom: {$regex: new RegExp('^' + prenom.toLowerCase(), 'i')}}, function(err, consultants){
-		if(err) {
-			c.status(500).send('WARNING***quelques chose cloche!');
-		} else if(consultants.length == 0) {
-			c.send('Désolé, consultant inexistant'); 
-		} else{
-		//res.json(consultant); 
-			c.render('consultant', { title: 'Prénom '+ prenom, allConsultants:consultants});
-		}
-	});
+		var regex = new RegExp(["^", String, "$"].join(""), "i");
+
+		serviceModel.ConsultantModel.find({Prenom: {$regex: new RegExp('^' + prenom.toLowerCase(), 'i')}}, function(err, consultants){
+			if(err) {
+				//c.status(500).send('WARNING***quelques chose cloche!');
+				c.render('error' ,{message:'WARNING***quelques chose cloche!'+c.status(500)});	
+			} else if(consultants.length == 0) {
+				c.render('error', {message:'Désolé, Consultant inexistant'}); 
+			} else{
+			//res.json(consultant); 
+				c.render('consultant', { title: 'Prénom '+ prenom, allConsultants:consultants});
+			}
+		});
+	}//fin else
 
 }
 
 //recherche by nom
 var getConsultantByNom = function(nom, c){
-	var regex = new RegExp(["^", String, "$"].join(""), "i");
-	try {
-		serviceModel.ConsultantModel.find({Nom: {$regex: new RegExp('^' + nom.toLowerCase(), 'i')}}, function(err, consultants){
-			if(err) {
-				c.status(500).send('WARNING***quelques chose cloche!');
-			} else if(consultants.length == 0) {
-				c.send('Désolé, consultant inexistant'); 
-			} else{
-			//res.json(consultant); 
-				c.render('consultant', { title: 'Nom'+ nom, allConsultants:consultants});
-				//console.log('trouvé');
-			}
-		});
+	if(!validator.isAlpha(nom)){
+		c.render('error' ,{message:'WARNING***quelques chose cloche!'});
+	}else{
 
-	} catch (err) {
-	// Handle the error here.
-	console.log('hum')
-	}
+			var regex = new RegExp(["^", String, "$"].join(""), "i");
+			try {
+				serviceModel.ConsultantModel.find({Nom: {$regex: new RegExp('^' + nom.toLowerCase(), 'i')}}, function(err, consultants){
+					if(err) {
+						c.render('error' ,{message:'WARNING***quelques chose cloche!'+c.status(500)});
+					} else if(consultants.length == 0) {
+						c.render('error', {message:'Désolé, consultant inexistant'}); 
+					} else{
+					//res.json(consultant); 
+						c.render('consultant', { title: 'Nom'+ nom, allConsultants:consultants});
+						//console.log('trouvé');
+					}
+				});
+
+			} catch (err) {
+			// Handle the error here.
+			console.log('hum')
+			}
+	}//fin else
 	
 }
 
@@ -307,9 +326,9 @@ var getConsultantByID = function(consulId, c){
 	//var consulId = req.params.id;
     serviceModel.ConsultantModel.findById(consulId, function(err, consultant){
 		if(err) {
-			c.status(500).send('WARNING***quelques chose cloche!');
+			c.render('error' ,{message:'WARNING***saisir un numéro employé valide!'});
 		} else if(consultant == null) {
-			c.send('Désolé, consultant inexistant');
+			c.render('error', {message:'Désolé, consultant inexistant'}); 
 			//res.json(consultant);		
 		} else{
 			//res.json(consultant); 
